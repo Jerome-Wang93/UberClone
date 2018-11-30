@@ -25,9 +25,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        getSupportActionBar()?.hide()
-
-        if( ParseUser.getCurrentUser() == null){
+        if (ParseUser.getCurrentUser() == null){
+            Log.i("Info","no user now")
             ParseAnonymousUtils.logIn { user, e ->
                 if (e == null){
                     Log.i("Info","Log in successful")
@@ -36,9 +35,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }else{
-            if (ParseUser.getCurrentUser().get("Rider or Driver") != null){
-                Log.i("Info",ParseUser.getCurrentUser().get("Rider or Driver").toString())
-            }
+
         }
     }
 }

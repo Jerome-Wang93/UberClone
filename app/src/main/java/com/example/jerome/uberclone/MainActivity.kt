@@ -1,5 +1,6 @@
 package com.example.jerome.uberclone
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,13 @@ import com.parse.ParseUser
 
 class MainActivity : AppCompatActivity() {
 
+    fun redirectActivity (){
+        if (ParseUser.getCurrentUser().get("Rider or Driver") == "Rider"){
+            var intent = Intent(applicationContext,RiderActivity :: class.java)
+            startActivity(intent)
+        }
+    }
+
     fun getStart(v : View){
         var switch = findViewById<Switch>(R.id.switch1)
         Log.i("Switch value", switch.isChecked.toString())
@@ -18,7 +26,7 @@ class MainActivity : AppCompatActivity() {
             usertype = "Driver"
         }
         ParseUser.getCurrentUser().put("Rider or Driver",usertype)
-        Log.i("Info","Hello " + usertype)
+        redirectActivity()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +43,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }else{
-
+            if ( ParseUser.getCurrentUser().get("Rider or Driver") != null){
+                redirectActivity()
+            }
         }
     }
 }

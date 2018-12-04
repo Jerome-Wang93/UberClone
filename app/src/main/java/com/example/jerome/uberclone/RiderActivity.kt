@@ -21,14 +21,50 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.jar.Manifest
 
-abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
+class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
-    public fun update(location : Location){
+
+    fun update(location : Location){
         var userLocation =  LatLng(location.latitude,location.longitude)
+        mMap.clear()
         mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation))
         mMap.addMarker(MarkerOptions().position(userLocation).title("Your location"))
+    }
+
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 1){
+            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+                    var locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                    var locationListener = object : LocationListener{
+                        override fun onLocationChanged(location: Location) {
+                            update(location)
+                        }
+
+                        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+
+                        }
+
+                        override fun onProviderDisabled(provider: String?) {
+
+                        }
+
+                        override fun onProviderEnabled(provider: String?) {
+
+                        }
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
+                    var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                    update(lastLocation)
+                }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,15 +96,15 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-                Log.i("2","1")
+
             }
 
             override fun onProviderDisabled(provider: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onProviderEnabled(provider: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
         }
 
@@ -77,7 +113,7 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
         }else{
             var permission = android.Manifest.permission.ACCESS_FINE_LOCATION
             if (ContextCompat.checkSelfPermission(this,permission) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this,permission as Array<String>,1)
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),1)
             }else{
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
                 var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)

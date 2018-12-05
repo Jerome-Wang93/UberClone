@@ -29,7 +29,7 @@ class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
     fun update(location : Location){
         var userLocation =  LatLng(location.latitude,location.longitude)
         mMap.clear()
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15f))
         mMap.addMarker(MarkerOptions().position(userLocation).title("Your location"))
     }
 

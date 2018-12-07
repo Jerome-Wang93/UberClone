@@ -27,7 +27,7 @@ import com.parse.ParseQuery
 import com.parse.ParseUser
 import java.util.jar.Manifest
 
-abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
+class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     var requestActive = false
@@ -39,7 +39,6 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.addMarker(MarkerOptions().position(userLocation).title("Your location"))
     }
 
-    var locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     var locationListener = object : LocationListener{
         override fun onLocationChanged(location: Location) {
             update(location)
@@ -70,6 +69,7 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
                             obj.delete()
                         }
                         button.setText("Call An Uber")
+                        requestActive = false
                     }
                 }
             }
@@ -77,6 +77,7 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
             if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),1)
             }else{
+                var locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
                 var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 if (lastLocation != null){
@@ -87,6 +88,7 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
                     request.saveInBackground {
                         if (it == null){
                             button.setText("Cancel Uber")
+                            requestActive = true
                         }else{
                             Log.i("Info","Request save error: " + it.message)
                         }
@@ -102,6 +104,7 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
         if (requestCode == 1){
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+                    var locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
                     var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                     update(lastLocation)
@@ -131,7 +134,7 @@ abstract class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
+        var locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if (Build.VERSION.SDK_INT < 23){
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
         }else{

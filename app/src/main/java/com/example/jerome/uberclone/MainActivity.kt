@@ -11,9 +11,14 @@ import com.parse.ParseUser
 
 class MainActivity : AppCompatActivity() {
 
+    var usertype = "Rider"
+
     fun redirectActivity (){
-        if (ParseUser.getCurrentUser().get("Rider or Driver") == "Rider"){
+        if (usertype == "Rider"){
             var intent = Intent(applicationContext,RiderActivity :: class.java)
+            startActivity(intent)
+        }else{
+            var intent = Intent(applicationContext,DriverActivity :: class.java)
             startActivity(intent)
         }
     }
@@ -21,11 +26,11 @@ class MainActivity : AppCompatActivity() {
     fun getStart(v : View){
         var switch = findViewById<Switch>(R.id.switch1)
         Log.i("Switch value", switch.isChecked.toString())
-        var usertype = "Rider"
         if ( switch.isChecked){
             usertype = "Driver"
         }
         ParseUser.getCurrentUser().put("Rider or Driver",usertype)
+        ParseUser.getCurrentUser().saveInBackground()
         redirectActivity()
     }
 

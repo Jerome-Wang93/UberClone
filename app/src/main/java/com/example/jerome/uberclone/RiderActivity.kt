@@ -101,7 +101,8 @@ class RiderActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun logout(v : View){
         ParseUser.logOut()
-        this.finish()
+        var intent = Intent(applicationContext,MainActivity :: class.java)
+        startActivity(intent)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

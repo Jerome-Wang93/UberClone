@@ -7,7 +7,7 @@ import android.widget.ListView
 
 class DriverActivity : AppCompatActivity() {
 
-    var requests : ArrayList<String> = "" as ArrayList<String>
+    var requests  =  arrayListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

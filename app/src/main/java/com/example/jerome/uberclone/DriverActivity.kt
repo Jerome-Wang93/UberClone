@@ -90,6 +90,7 @@ class DriverActivity : AppCompatActivity() {
 
         var adapter = ArrayAdapter(this,android.R.layout.simple_list_item_1,requests)
         requestList.setAdapter(adapter)
+        //delay one day
 
     }
 }

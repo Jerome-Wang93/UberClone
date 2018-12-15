@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Log.i("Info","create")
+
         if (ParseUser.getCurrentUser() == null){
             Log.i("Info","no user now")
             ParseAnonymousUtils.logIn { user, e ->
@@ -52,5 +54,15 @@ class MainActivity : AppCompatActivity() {
                 redirectActivity()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("Info","Destroy")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.i("Info","stop")
     }
 }

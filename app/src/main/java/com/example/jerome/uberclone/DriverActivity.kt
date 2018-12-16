@@ -20,11 +20,12 @@ import com.parse.ParseUser
 class DriverActivity : AppCompatActivity() {
 
     var requests  =  arrayListOf<String>()
+    lateinit var adapter : ArrayAdapter<*>
 
 
     var locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
-            updateList(location)
+
         }
 
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -40,27 +41,10 @@ class DriverActivity : AppCompatActivity() {
         }
     }
 
-    fun updateList(location : Location){
-        var query = ParseQuery<ParseObject>("Request")
-        //var geopoint = ParseGeoPoint(location.latitude,location.longitude)
-        //query.whereNear("Location",geopoint)
-        query.findInBackground { objects, e ->
-            if (e == null){
-                if (objects.size > 0){
-                    Log.i("Info","size" + objects.size)
-                    for (obj in objects){
-                        //var distance = geopoint.distanceInMilesTo(obj.get("Location") as ParseGeoPoint)
-                        //var distanceOneDp = (Math.round(distance * 10))/10
-                        requests.add("test")
-                        Log.i("Info",requests[0])
-                    }
-                }else{
-                    Log.i("Info","no result")
-                }
-            }else{
-                Log.i("Info",e.message)
-            }
-        }
+    fun updateList() {
+
+
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -69,10 +53,9 @@ class DriverActivity : AppCompatActivity() {
         if (requestCode == 1){
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
-                    var locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
-                    var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                    updateList(lastLocation)
+                    requests.add("test")
+                    Log.i("jian","add")
+                    adapter.notifyDataSetChanged()
                 }
             }
         }
@@ -82,20 +65,20 @@ class DriverActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_driver)
         setTitle("Nearby Request")
+        requests.add("These the nearby requests:")
+        adapter = ArrayAdapter(this,android.R.layout.simple_list_item_1,requests)
         var requestList = findViewById<ListView>(R.id.request_list)
+        requestList.setAdapter(adapter)
 
 
         if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),1)
         }else{
-            var locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
-            var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            updateList(lastLocation)
+            updateList()
         }
 
-        var adapter = ArrayAdapter(this,android.R.layout.simple_list_item_1,requests)
-        requestList.setAdapter(adapter)
+
+
 
     }
 }

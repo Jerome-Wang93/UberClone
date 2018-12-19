@@ -21,6 +21,7 @@ class DriverActivity : AppCompatActivity() {
 
     var requests  =  arrayListOf<String>()
     lateinit var adapter : ArrayAdapter<*>
+    lateinit var locationManager : LocationManager
 
 
     var locationListener = object : LocationListener {
@@ -41,10 +42,24 @@ class DriverActivity : AppCompatActivity() {
         }
     }
 
-    fun updateList() {
-
-
-
+    fun updateList(location: Location) {
+        requests.clear()
+        requests.add("These the nearby requests:")
+        var query = ParseQuery<ParseObject>("Request")
+        var geoPoint = ParseGeoPoint(location.latitude,location.longitude)
+        query.whereNear("Location",geoPoint)
+        query.findInBackground { objects, e ->
+            if (e == null){
+                if (objects.size > 0){
+                    for ( obj : ParseObject in objects){
+                        var distanceInMiles = geoPoint.distanceInMilesTo(obj.get("Location") as ParseGeoPoint)
+                        var distanceOneDp = (Math.round(distanceInMiles * 10) / 10) as Double
+                        requests.add(distanceOneDp.toString() + " miles")
+                    }
+                }
+            }
+        }
+        adapter.notifyDataSetChanged()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -53,9 +68,10 @@ class DriverActivity : AppCompatActivity() {
         if (requestCode == 1){
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
-                    requests.add("test")
-                    Log.i("jian","add")
-                    adapter.notifyDataSetChanged()
+                    locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
+                    var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                    updateList(lastLocation)
                 }
             }
         }
@@ -65,7 +81,6 @@ class DriverActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_driver)
         setTitle("Nearby Request")
-        requests.add("These the nearby requests:")
         adapter = ArrayAdapter(this,android.R.layout.simple_list_item_1,requests)
         var requestList = findViewById<ListView>(R.id.request_list)
         requestList.setAdapter(adapter)
@@ -74,11 +89,10 @@ class DriverActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),1)
         }else{
-            updateList()
+            locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
+            var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            updateList(lastLocation)
         }
-
-
-
-
     }
 }

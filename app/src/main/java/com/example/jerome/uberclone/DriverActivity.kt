@@ -51,15 +51,16 @@ class DriverActivity : AppCompatActivity() {
         query.findInBackground { objects, e ->
             if (e == null){
                 if (objects.size > 0){
-                    for ( obj : ParseObject in objects){
-                        var distanceInMiles = geoPoint.distanceInMilesTo(obj.get("Location") as ParseGeoPoint)
-                        var distanceOneDp = (Math.round(distanceInMiles * 10) / 10) as Double
-                        requests.add(distanceOneDp.toString() + " miles")
+                    for (  i in objects.indices){
+                        var distanceInMiles = geoPoint.distanceInMilesTo((objects[i].get("Location")) as ParseGeoPoint)
+                        var disOneDp = Math.round(distanceInMiles * 10) / 10
+                        requests.add(distanceInMiles.toString() + " miles")
+                        adapter.notifyDataSetChanged()
                     }
                 }
             }
         }
-        adapter.notifyDataSetChanged()
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

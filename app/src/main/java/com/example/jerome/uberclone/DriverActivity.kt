@@ -1,6 +1,7 @@
 package com.example.jerome.uberclone
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -22,6 +23,8 @@ class DriverActivity : AppCompatActivity() {
     var requests  =  arrayListOf<String>()
     lateinit var adapter : ArrayAdapter<*>
     lateinit var locationManager : LocationManager
+    var requestLatitudes = arrayListOf<Double>()
+    var requestLontitudes = arrayListOf<Double>()
 
 
     var locationListener = object : LocationListener {
@@ -43,24 +46,27 @@ class DriverActivity : AppCompatActivity() {
     }
 
     fun updateList(location: Location) {
-        requests.clear()
-        requests.add("These the nearby requests:")
         var query = ParseQuery<ParseObject>("Request")
         var geoPoint = ParseGeoPoint(location.latitude,location.longitude)
         query.whereNear("Location",geoPoint)
         query.findInBackground { objects, e ->
             if (e == null){
+                requests.clear()
+                requestLontitudes.clear()
+                requestLatitudes.clear()
                 if (objects.size > 0){
                     for (  i in objects.indices){
-                        var distanceInMiles = geoPoint.distanceInMilesTo((objects[i].get("Location")) as ParseGeoPoint)
+                        var riderLocation = (objects[i].get("Location")) as ParseGeoPoint
+                        var distanceInMiles = geoPoint.distanceInMilesTo(riderLocation)
                         var disOneDp = Math.round(distanceInMiles * 10) / 10
                         requests.add(distanceInMiles.toString() + " miles")
                         adapter.notifyDataSetChanged()
+                        requestLatitudes.add(riderLocation.latitude)
+                        requestLontitudes.add(riderLocation.longitude)
                     }
                 }
             }
         }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -94,6 +100,23 @@ class DriverActivity : AppCompatActivity() {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0F,locationListener)
             var lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
             updateList(lastLocation)
+        }
+
+        requestList.setOnItemClickListener { parent, view, position, id ->
+            if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),1)
+            }else{
+                locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                var lLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                if ( requestLatitudes.size > position && requestLontitudes.size > position){
+                    var intent = Intent(applicationContext,DriverLocationActivity :: class.java)
+                    intent.putExtra("riderLatitude",requestLatitudes[position])
+                    intent.putExtra("riderLongtitude",requestLontitudes[position])
+                    intent.putExtra("driverLatitude",lLocation.latitude)
+                    intent.putExtra("driverLongitude",lLocation.longitude)
+                    startActivity(intent)
+                }
+            }
         }
     }
 }

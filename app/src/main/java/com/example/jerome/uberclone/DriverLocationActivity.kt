@@ -43,16 +43,16 @@ class DriverLocationActivity : AppCompatActivity(), OnMapReadyCallback {
                 intent.getDoubleExtra("driverLongitude",0.0))
         val riderLocation = LatLng(intent.getDoubleExtra("riderLatitude",0.0),
                 intent.getDoubleExtra("riderLongitude",0.0))
-        markers.add(mMap.addMarker(MarkerOptions().position(driverLocation).title("Marker in Driver")))
-        markers.add(mMap.addMarker(MarkerOptions().position(riderLocation).title("Marker in Rider")))
+        mMap.addMarker(MarkerOptions().position(driverLocation).title("Marker in Driver"))
+        mMap.addMarker(MarkerOptions().position(riderLocation).title("Marker in Rider"))
 
-        var builder = LatLngBounds.Builder()
+        /*var builder = LatLngBounds.Builder()
         for ( ma in markers.indices){
             builder.include(markers[ma].position)
         }
         var bounds : LatLngBounds = builder.build()
-        var padding = 0
-        var cu = CameraUpdateFactory.newLatLngBounds(bounds,padding)
-        mMap.animateCamera(cu)
+
+        var cu = CameraUpdateFactory.newLatLngBounds(bounds,100,100,0)*/
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(driverLocation,12.0f))
     }
 }

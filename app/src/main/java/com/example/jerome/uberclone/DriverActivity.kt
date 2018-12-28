@@ -24,7 +24,7 @@ class DriverActivity : AppCompatActivity() {
     lateinit var adapter : ArrayAdapter<*>
     lateinit var locationManager : LocationManager
     var requestLatitudes = arrayListOf<Double>()
-    var requestLontitudes = arrayListOf<Double>()
+    var requestLongitudes = arrayListOf<Double>()
 
 
     var locationListener = object : LocationListener {
@@ -52,7 +52,7 @@ class DriverActivity : AppCompatActivity() {
         query.findInBackground { objects, e ->
             if (e == null){
                 requests.clear()
-                requestLontitudes.clear()
+                requestLongitudes.clear()
                 requestLatitudes.clear()
                 if (objects.size > 0){
                     for (  i in objects.indices){
@@ -62,7 +62,7 @@ class DriverActivity : AppCompatActivity() {
                         requests.add(distanceInMiles.toString() + " miles")
                         adapter.notifyDataSetChanged()
                         requestLatitudes.add(riderLocation.latitude)
-                        requestLontitudes.add(riderLocation.longitude)
+                        requestLongitudes.add(riderLocation.longitude)
                     }
                 }
             }
@@ -108,13 +108,19 @@ class DriverActivity : AppCompatActivity() {
             }else{
                 locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                 var lLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                if ( requestLatitudes.size > position && requestLontitudes.size > position){
+                if ( requestLatitudes.size > position && requestLongitudes.size > position){
                     var intent = Intent(applicationContext,DriverLocationActivity :: class.java)
                     intent.putExtra("riderLatitude",requestLatitudes[position])
-                    intent.putExtra("riderLongtitude",requestLontitudes[position])
+                    intent.putExtra("riderLongitude",requestLongitudes[position])
                     intent.putExtra("driverLatitude",lLocation.latitude)
                     intent.putExtra("driverLongitude",lLocation.longitude)
+                    Log.i("DriverActivity-test",lLocation.latitude.toString() +
+                            "," + lLocation.longitude.toString())
+                    Log.i("DriverActivity-test",requestLatitudes[position].toString() +
+                            "," + requestLongitudes[position].toString())
+
                     startActivity(intent)
+
                 }
             }
         }

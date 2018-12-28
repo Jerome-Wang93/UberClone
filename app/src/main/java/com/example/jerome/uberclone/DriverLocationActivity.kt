@@ -2,6 +2,7 @@ package com.example.jerome.uberclone
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -37,22 +38,15 @@ class DriverLocationActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        var intent = intent
-        var markers = arrayListOf<Marker>()
+        /*var intent = intent
+        Log.i("receive",intent.getDoubleExtra("driverLatitude",0.0).toString())
         val driverLocation = LatLng(intent.getDoubleExtra("driverLatitude",0.0),
                 intent.getDoubleExtra("driverLongitude",0.0))
-        val riderLocation = LatLng(intent.getDoubleExtra("riderLatitude",0.0),
-                intent.getDoubleExtra("riderLongitude",0.0))
+
         mMap.addMarker(MarkerOptions().position(driverLocation).title("Marker in Driver"))
-        mMap.addMarker(MarkerOptions().position(riderLocation).title("Marker in Rider"))
-
-        /*var builder = LatLngBounds.Builder()
-        for ( ma in markers.indices){
-            builder.include(markers[ma].position)
-        }
-        var bounds : LatLngBounds = builder.build()
-
-        var cu = CameraUpdateFactory.newLatLngBounds(bounds,100,100,0)*/
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(driverLocation,12.0f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(driverLocation))*/
+        var lat = LatLng(-34.0,151.0)
+        mMap.addMarker(MarkerOptions().position(lat).title("sss"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(lat))
     }
 }
